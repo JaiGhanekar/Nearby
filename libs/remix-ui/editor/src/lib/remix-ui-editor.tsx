@@ -286,6 +286,8 @@ export const EditorUI = (props: EditorUIProps) => {
       monacoRef.current.editor.setModelLanguage(file.model, 'remix-solidity')
     } else if (file.language === 'cairo') {
       monacoRef.current.editor.setModelLanguage(file.model, 'remix-cairo')
+    } else {
+        monacoRef.current.editor.setModelLanguage(file.model, 'typescript')
     }
     setAnnotationsbyFile(props.currentFile)
     setMarkerbyFile(props.currentFile)
