@@ -7,6 +7,7 @@ import {allCommands, allPrograms} from './commands' // eslint-disable-line
 import TerminalWelcomeMessage from './terminalWelcome' // eslint-disable-line
 import { Toaster } from '@remix-ui/toaster' // eslint-disable-line
 import { ModalDialog } from '@remix-ui/modal-dialog' // eslint-disable-line
+import axios from 'axios'
 
 import './remix-ui-terminal.css'
 import vm from 'vm'
@@ -18,7 +19,8 @@ import RenderKnownTransactions from './components/RenderKnownTransactions' // es
 import parse from 'html-react-parser'
 import { EMPTY_BLOCK, KNOWN_TRANSACTION, RemixUiTerminalProps, UNKNOWN_TRANSACTION } from './types/terminalTypes'
 import { wrapScript } from './utils/wrapScript'
-
+import * as nearAPI from 'near-api-js'
+import { WalletConnection } from 'near-api-js'
 /* eslint-disable-next-line */
 export interface ClipboardEvent<T = Element> extends SyntheticEvent<T, any> {
   clipboardData: DataTransfer;
@@ -67,6 +69,7 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
   const [searchInput, setSearchInput] = useState('')
   const [showTableHash, setShowTableHash] = useState([])
 
+
   // terminal inputRef
   const inputEl = useRef(null)
   const messagesEndRef = useRef(null)
@@ -74,11 +77,20 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
   // terminal dragable
   const panelRef = useRef(null)
   const terminalMenu = useRef(null)
+  const COMPILE_ENDPOINT = 'http://localhost:3000/deploy'
+  const WALLET_PREFIX = 'wallet'
+  const HASH_URL_DELIM = '/#'
+  const QUERY_PARAM_DELIM = '?'
+  const EMPTY_STR = ''
+  const SIGN_IN_REQUIRED_ERROR = 'Error this command requires sign in, continue by running near.signIn(accountId)'
+  const KEY_DOES_NOT_EXIST_ERROR = 'Error authentication key required please run near.signIn(accountId)'
 
   const scrollToBottom = () => {
     messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
   }
 
+
+  // useScript('https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js')
   useEffect(() => {
     props.onReady({
       logHtml: (html) => {
@@ -108,7 +120,7 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
       const script = String(args[0])
       _shell(script, scopedCommands, function (error, output) {
         if (error) scriptRunnerDispatch({ type: 'error', payload: { message: error } })
-        if (output) scriptRunnerDispatch({ type: 'script', payload: { message: '5' } })
+        if (output) scriptRunnerDispatch({ type: 'script', payload: { message: JSON.stringify(output) } })
       })
     }, { activate: true }, dispatch)
   }, [autoCompletState.text])
@@ -160,28 +172,124 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
     if (cb) cb()
   }
 
+  async function deployCode(accountId: string, file: string, key: string): Promise<any> {
+    const content = await _deps.fileManager.readFile(file)
+    const headers = {'Content-Type': 'text/plain', 'accountid': accountId, key: key}
+    const result = await axios.post(COMPILE_ENDPOINT, content, { headers })
+    //TODO: Handle bad code input
+    return result
+  }
+
+  async function isSignedIn(pendingPrefix = 'near-api-js:keystore:pending_key'): Promise<boolean> {
+    const near = await connection()
+    const wallet = new WalletConnection(near, WALLET_PREFIX)
+    //TODO: FIXME this is a hack for sign in to query the url
+    if (Object.keys(localStorage).filter((key) => key.indexOf(pendingPrefix) >= 0).length > 0) {
+      const convertedUrl = window.location.href.replace(HASH_URL_DELIM, QUERY_PARAM_DELIM)
+      window.history.pushState(EMPTY_STR, EMPTY_STR, convertedUrl)
+      await wallet._completeSignInWithAccessKey()
+    }
+    return wallet.isSignedIn()
+  }
+
+
+  async function connection(): Promise<nearAPI.Near> {
+    const { keyStores, connect } = nearAPI
+    const keyStore = new keyStores.BrowserLocalStorageKeyStore();
+    const config = {
+      networkId: "testnet",
+      keyStore,
+      nodeUrl: "https://rpc.testnet.near.org",
+      walletUrl: "https://wallet.testnet.near.org",
+      helperUrl: "https://helper.testnet.near.org",
+      explorerUrl: "https://explorer.testnet.near.org",
+      headers: {}
+    }
+
+    return connect(config)
+  }
+
+  async function loadAccount(accountName: string) : Promise<any> {
+    const near = await connection()
+    return await near.account(accountName)
+  }
+
   const _shell = async (script, scopedCommands, done) => { // default shell
     if (script.indexOf('remix:') === 0) {
       return done(null, 'This type of command has been deprecated and is not functionning anymore. Please run remix.help() to list available commands.')
-    }
-    if (script.indexOf('remix.') === 0) {
-      // we keep the old feature. This will basically only be called when the command is querying the "remix" object.
-      // for all the other case, we use the Code Executor plugin
-      const context = { remix: { exeCurrent: (script: any) => { return execute(undefined, script) }, loadgist: (id: any) => { return loadgist(id, () => {}) }, execute: (fileName, callback) => { return execute(fileName, callback) } } }
-      try {
-        const cmds = vm.createContext(context)
-        const result = vm.runInContext(script, cmds) // eslint-disable-line
-        console.log({ result })
-        return done(null, result)
-      } catch (error) {
-        return done(error.message)
-      }
     }
     try {
       if (script.trim().startsWith('git')) {
         // await this.call('git', 'execute', script) code might be used in the future
       } else {
-        await call('scriptRunner', 'execute', script)
+        const near_context = {
+            near: {
+              connection: async () => {return await connection()},
+              loadAccount: async (accountId: string) => {
+                const account = await loadAccount(accountId)
+                console.log(account)
+                return done(null, account)
+              },
+              getAccountBalance: async (accountId: string) => {
+                const account = await loadAccount(accountId)
+                const balance = await account.getAccountBalance()
+                return done(null, balance)
+              },
+              deploy: async (accountId: string, fileName: string) => {
+                try {
+                  if (await isSignedIn()) {
+                    const key = localStorage.getItem(`near-api-js:keystore:${accountId}:testnet`)
+                    if (key) {
+                      const res = await deployCode(accountId, fileName, key)
+                      done(null, res)
+                    } else {
+                      done(KEY_DOES_NOT_EXIST_ERROR)
+                    }
+                  } else {
+                      done(SIGN_IN_REQUIRED_ERROR)
+                  }
+
+                } catch (error) {
+                  done(error.messages)
+                }
+              },
+              signIn: async (contractId: string) => {
+                const near = await connection()
+                var wallet = new WalletConnection(near, WALLET_PREFIX)
+                await wallet.requestSignIn({ contractId: contractId })
+                done()
+              },
+              isSignedIn: async () => {
+                done(null, isSignedIn() ? "true" : "false")
+              },
+              signOut: async () => {
+                const near = await connection()
+                var wallet = new WalletConnection(near, WALLET_PREFIX)
+                wallet.signOut()
+              },
+              callContract: async (accountId: string, contractId: string, viewMethods: Array<string>, changeMethods: Array<string>, cb: any) => {
+                try {
+                  const account = await loadAccount(accountId)
+                  const contract = new nearAPI.Contract(
+                    account,
+                    contractId,
+                    {
+                      viewMethods: viewMethods,
+                      changeMethods: changeMethods,
+                    })
+                    const result = await cb(contract)
+                    done(null, result)
+                  } catch (error) {
+                    done(JSON.stringify(error.message))
+                  }
+              }
+            }
+          }
+          const cmds = vm.createContext(near_context)
+          const result = vm.runInContext(script, cmds) // eslint-disable-line
+          console.log({ result })
+          return done(null, result)
+          //await call('scriptRunner', 'execute', script)
       }
       done()
     } catch (error) {
@@ -431,6 +539,7 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
   const classNameBlock = 'remix_ui_terminal_block px-4 py-1 text-break'
 
   return (
+
     <div style={{ flexGrow: 1 }} className='remix_ui_terminal_panel' ref={panelRef}>
       <div className="remix_ui_terminal_bar d-flex">
         <div className="remix_ui_terminal_menu d-flex w-100 align-items-center position-relative border-top border-dark bg-light" ref={terminalMenu} data-id="terminalToggleMenu">

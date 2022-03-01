@@ -87,7 +87,7 @@ export const loadWorkspacePreset = async (template: 'gist-template' | 'code-temp
 
         if (params.code) {
           const hash = bufferToHex(keccakFromString(params.code))
-
+          //TODO: Fix import extension
           path = 'contract-' + hash.replace('0x', '').substring(0, 10) + '.sol'
           content = atob(params.code)
           await workspaceProvider.set(path, content)
@@ -138,6 +138,7 @@ export const loadWorkspacePreset = async (template: 'gist-template' | 'code-temp
       // insert example contracts
       for (const file in examples) {
         try {
+          //TODO: add Assembly script
           await workspaceProvider.set(examples[file].name, examples[file].content)
         } catch (error) {
           console.error(error)

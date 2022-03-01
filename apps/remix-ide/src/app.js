@@ -14,7 +14,7 @@ import { PermissionHandlerPlugin } from './app/plugins/permission-handler-plugin
 import { AstWalker } from '@remix-project/remix-astwalker'
 
 import { WalkthroughService } from './walkthroughService'
-
+//TODO: Create pluging to call assembly script here
 import { OffsetToLineColumnConverter, CompilerMetadata, CompilerArtefacts, FetchAndCompile, CompilerImports, EditorContextListener, GistHandler } from '@remix-project/core-plugin'
 
 import Registry from './app/state/registry'
@@ -196,7 +196,7 @@ class AppComponent {
 
     const configPlugin = new ConfigPlugin()
     this.layout = new Layout()
-    
+
     const permissionHandler = new PermissionHandlerPlugin()
 
     this.engine.register([
@@ -312,7 +312,7 @@ class AppComponent {
   async activate () {
     const queryParams = new QueryParams()
     const params = queryParams.get()
-    
+
     if (isElectron()) {
       this.appManager.activatePlugin('remixd')
     }
@@ -382,7 +382,7 @@ class AppComponent {
       }
     })
     // activate solidity plugin
-    this.appManager.activatePlugin(['solidity', 'udapp'])
+    this.appManager.activatePlugin([])
     // Load and start the service who manager layout and frame
   }
 }
