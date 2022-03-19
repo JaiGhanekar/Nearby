@@ -1,5 +1,5 @@
 import React from 'react'
-import BasicLogo from './BasicLogo'
+import NearbyBricks from '../../../../common/nearby-bricks'
 interface HomeProps {
   verticalIconPlugin: any
 }
@@ -14,7 +14,7 @@ function Home ({ verticalIconPlugin }: HomeProps) {
       data-id="verticalIconsHomeIcon"
       id="verticalIconsHomeIcon"
     >
-      <BasicLogo />
+      <NearbyBricks viewBox="0 0 105 100"/>
     </div>
   )
 }

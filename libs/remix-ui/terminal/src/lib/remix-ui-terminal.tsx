@@ -224,7 +224,6 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
       } else {
         const near_context = {
             near: {
-              connection: async () => {return await connection()},
               loadAccount: async (accountId: string) => {
                 const account = await loadAccount(accountId)
                 console.log(account)
@@ -235,13 +234,17 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
                 const balance = await account.getAccountBalance()
                 return done(null, balance)
               },
-              deploy: async (accountId: string, fileName: string) => {
+              deploy: async (accountId: string, filePath: string) => {
                 try {
                   if (await isSignedIn()) {
                     const key = localStorage.getItem(`near-api-js:keystore:${accountId}:testnet`)
                     if (key) {
-                      const res = await deployCode(accountId, fileName, key)
-                      done(null, res)
+                      try {
+                        const res = await deployCode(accountId, filePath, key)
+                        done(null, res)
+                      } catch (error) {
+                        done(error.response.data.message)
+                      }
                     } else {
                       done(KEY_DOES_NOT_EXIST_ERROR)
                     }
@@ -266,6 +269,10 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
                 const near = await connection()
                 var wallet = new WalletConnection(near, WALLET_PREFIX)
                 wallet.signOut()
+              },
+              help: async () => {
+                const commands = `The following commands can be used: loadAccount, getAccountBalance, deploy, signIn, isSignedIn, signOut. Ex: near.deploy("example.testnet","assembly/hello.ts")`
+                done(null, commands)
               },
               callContract: async (accountId: string, contractId: string, viewMethods: Array<string>, changeMethods: Array<string>, cb: any) => {
                 try {
@@ -547,36 +554,6 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
           <div className="mx-2 remix_ui_terminal_console" id="clearConsole" data-id="terminalClearConsole" onClick={handleClearConsole} >
             <i className="fas fa-ban" aria-hidden="true" title="Clear console"
             ></i>
-          </div>
-          <div className="mx-2" title='Pending Transactions'>0</div>
-          <div className="pt-1 h-80 mx-3 align-items-center remix_ui_terminal_listenOnNetwork custom-control custom-checkbox">
-            <input
-              className="custom-control-input"
-              id="listenNetworkCheck"
-              onChange={listenOnNetwork}
-              type="checkbox"
-              title="If checked Remix will listen on all transactions mined in the current environment and not only transactions created by you"
-            />
-            <label
-              className="pt-1 form-check-label custom-control-label text-nowrap"
-              title="If checked Remix will listen on all transactions mined in the current environment and not only transactions created by you"
-              htmlFor="listenNetworkCheck"
-            >
-              listen on network
-            </label>
-          </div>
-          <div className="remix_ui_terminal_search d-flex align-items-center h-100">
-            <i
-              className="remix_ui_terminal_searchIcon d-flex align-items-center justify-content-center fas fa-search bg-light"
-              aria-hidden="true">
-            </i>
-            <input
-              onChange={(event) => setSearchInput(event.target.value.trim()) }
-              type="text"
-              className="remix_ui_terminal_filter border form-control"
-              id="searchInput"
-              placeholder="Search with transaction hash or address"
-              data-id="terminalInputSearch" />
           </div>
         </div>
       </div>

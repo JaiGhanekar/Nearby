@@ -43,7 +43,7 @@ const RemixUiVerticalIconsPanel = ({
       }
     })
   }
-  
+
   useEffect(() => {
     window.addEventListener('resize', evaluateScrollability)
     evaluateScrollability()
@@ -117,7 +117,7 @@ const RemixUiVerticalIconsPanel = ({
           />) : null }
           <IconList
             theme={theme}
-            icons={icons.filter((p) => p.profile.name === 'settings' || p.profile.name === 'pluginManager')}
+            icons={icons.filter((p) => p.profile.name === 'settings')}
             verticalIconsPlugin={verticalIconsPlugin}
             itemContextAction={itemContextAction}
           />

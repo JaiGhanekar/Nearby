@@ -166,7 +166,7 @@ class AppComponent {
     // ----------------- network service (resolve network id / name) -----
     const networkModule = new NetworkModule(blockchain)
     // ----------------- represent the current selected web3 provider ----
-    const web3Provider = new Web3ProviderModule(blockchain)
+    //const web3Provider = new Web3ProviderModule(blockchain)
     const hardhatProvider = new HardhatProvider(blockchain)
     // ----------------- convert offset to line/column service -----------
     const offsetToLineColumnConverter = new OffsetToLineColumnConverter()
@@ -216,7 +216,7 @@ class AppComponent {
       offsetToLineColumnConverter,
       contextualListener,
       terminal,
-      web3Provider,
+      //web3Provider,
       fetchAndCompile,
       dGitProvider,
       storagePlugin,
@@ -325,7 +325,7 @@ class AppComponent {
     await this.appManager.activatePlugin(['layout'])
     await this.appManager.activatePlugin(['notification'])
     await this.appManager.activatePlugin(['editor'])
-    await this.appManager.activatePlugin(['permissionhandler', 'theme', 'fileManager', 'compilerMetadata', 'compilerArtefacts', 'network', 'web3Provider', 'offsetToLineColumnConverter'])
+    await this.appManager.activatePlugin(['permissionhandler', 'theme', 'fileManager', 'compilerMetadata', 'compilerArtefacts', 'network', 'offsetToLineColumnConverter'])
     await this.appManager.activatePlugin(['mainPanel', 'menuicons', 'tabs'])
     await this.appManager.activatePlugin(['sidePanel']) // activating  host plugin separately
     await this.appManager.activatePlugin(['home'])

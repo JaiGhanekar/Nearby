@@ -7,6 +7,8 @@ import { Toaster } from '@remix-ui/toaster' // eslint-disable-line
 import PluginButton from './components/pluginButton' // eslint-disable-line
 import { QueryParams } from '@remix-project/remix-lib'
 import { ThemeContext, themes } from './themeContext'
+import NearbyLogo from '../../../common/nearby-logo'
+
 declare global {
   interface Window {
     _paq: any
@@ -274,42 +276,13 @@ export const RemixUiHomeTab = (props: RemixUiHomeTabProps) => {
       <div className="d-flex flex-column ml-4" id="remixUiRightPanel">
         <div className="border-bottom d-flex flex-column mr-4 pb-3 mb-3">
           <div className="d-flex justify-content-between ">
-            <div className="mx-4 my-4 d-flex">
-              <label style={ { fontSize: 'xxx-large', height: 'auto', alignSelf: 'flex-end' } }>Remix IDE</label>
-            </div>
-            <div className="mr-4 d-flex">
-              <img className="mt-4 mb-2 remixui_home_logoImg" src="assets/img/guitarRemiCroped.webp" onClick={ () => playRemi() } alt=""></img>
-              <audio
-                id="remiAudio"
-                muted={false}
-                src="assets/audio/remiGuitar-single-power-chord-A-minor.wav"
-                ref={remiAudioEl}
-              ></audio>
-            </div>
+          <NearbyLogo/>
           </div>
           <div>
-            <i className="pl-4 text-danger fas fa-exclamation-triangle"></i>
-            <span className="px-2 remixui_home_text text-danger mt-4 pt-4">
-              Scam Alert: Beware of online videos promoting "liquidity front runner bots".
-            </span>
-            <a className="remixui_home_text" target="__blank" href="https://medium.com/remix-ide/remix-in-youtube-crypto-scams-71c338da32d">Learn more</a>
           </div>
         </div>
         <div className="row mx-2 mr-4" data-id="landingPageHpSections">
           <div className="ml-3">
-            <div className="mb-5">
-              <h4>Featured Plugins</h4>
-              <div className="d-flex flex-row pt-2">
-                <ThemeContext.Provider value={ state.themeQuality }>
-                  <PluginButton imgPath="assets/img/solidityLogo.webp" envID="solidityLogo" envText="Solidity" callback={() => startSolidity()} />
-                  <PluginButton imgPath="assets/img/starkNetLogo.webp" envID="starkNetLogo" envText="StarkNet" l2={true} callback={() => startStarkNet()} />
-                  <PluginButton imgPath="assets/img/solhintLogo.webp" envID="solhintLogo" envText="Solhint linter" callback={() => startSolhint()} />
-                  <PluginButton imgPath="assets/img/learnEthLogo.webp" envID="learnEthLogo" envText="LearnEth" callback={() => startLearnEth()} />
-                  <PluginButton imgPath="assets/img/sourcifyLogo.webp" envID="sourcifyLogo" envText="Sourcify" callback={() => startSourceVerify()} />
-                  <PluginButton imgPath="assets/img/moreLogo.webp" envID="moreLogo" envText="More" callback={startPluginManager} />
-                </ThemeContext.Provider>
-              </div>
-            </div>
             <div className="d-flex">
               <div className="file">
                 <h4>File</h4>

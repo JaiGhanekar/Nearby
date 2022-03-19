@@ -11,7 +11,7 @@ const profile = {
   methods: [],
   events: [],
   description: ' - ',
-  icon: 'assets/img/remixLogo.webp',
+  icon: 'assets/img/bricks.png',
   location: 'mainPanel',
   version: packageJson.version
 }
