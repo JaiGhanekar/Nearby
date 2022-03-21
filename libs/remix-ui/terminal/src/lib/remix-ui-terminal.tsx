@@ -263,7 +263,7 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
                 done()
               },
               isSignedIn: async () => {
-                done(null, isSignedIn() ? "true" : "false")
+                done(null, await isSignedIn() ? "true" : "false")
               },
               signOut: async () => {
                 const near = await connection()

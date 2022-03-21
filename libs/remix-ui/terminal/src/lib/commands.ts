@@ -11,9 +11,9 @@ export const allCommands = [
   { 'near.getAccountBalance(accountId)' : 'Get balance for account'},
   { 'near.deploy(accountId, filePath)' : 'Build and deploy typescript file to the near blockchain using assembly script build'},
   { 'near.signIn(accountId)': 'Sign in to the near wallet'},
-  { 'near.isSignedIn()' : 'Determines if there is an active session'},
+  { 'near.isSignedIn()': 'Determines if there is an active session'},
   { 'near.callContract(accountId, contractId, viewMethods, changeMethods, cb)' : 'Calls a smart contract that has been previously deployed to the near blockchain. See near-api-js call contract method.' },
-  { 'near.signOut()' : 'Terminates existing session' },
+  { 'near.signOut()': 'Terminates existing session' },
   { 'near.help()': 'Show the available commands' }
   // { 'remix.execute(filepath)': 'Run the script specified by file path. If filepath is empty, script currently displayed in the editor is executed.' },
   // { 'remix.exeCurrent()': 'Run the script currently displayed in the editor.' },

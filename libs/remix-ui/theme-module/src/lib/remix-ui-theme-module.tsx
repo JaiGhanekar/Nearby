@@ -12,7 +12,8 @@ export function RemixUiThemeModule({ themeModule }: RemixUiThemeModuleProps) {
   const [themeName, setThemeName] = useState('')
 
   useEffect(() => {
-      themeModule.switchTheme()
+      //Sets initial theme
+      themeModule.switchTheme('Light')
   }, [themeName, themeModule])
 
   return (

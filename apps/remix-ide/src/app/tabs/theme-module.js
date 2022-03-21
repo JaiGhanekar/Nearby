@@ -45,7 +45,7 @@ export class ThemeModule extends Plugin {
     currentTheme = currentTheme && currentTheme.toLocaleLowerCase()
     currentTheme = this.themes[currentTheme] ? currentTheme : null
     this.currentThemeState = { queryTheme, currentTheme }
-    this.active = queryTheme || currentTheme || 'dark'
+    this.active = queryTheme || currentTheme || 'light'
     this.forced = !!queryTheme
   }
 
@@ -84,7 +84,7 @@ export class ThemeModule extends Plugin {
    * @param {string} [themeName] - The name of the theme
    */
   switchTheme (themeName) {
-    themeName = themeName && themeName.toLocaleLowerCase() 
+    themeName = themeName && themeName.toLocaleLowerCase()
     if (themeName && !Object.keys(this.themes).includes(themeName)) {
       throw new Error(`Theme ${themeName} doesn't exist`)
     }

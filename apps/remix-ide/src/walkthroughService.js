@@ -24,23 +24,9 @@ export class WalkthroughService extends Plugin {
     if (!localStorage.getItem('hadTour_initial')) {
       introJs().setOptions({
         steps: [{
-          title: 'Welcome to Remix IDE',
+          title: 'Welcome to Nearby',
           intro: 'Click to launch the Home tab that contains links, tips, and shortcuts..',
           element: document.querySelector('#verticalIconsHomeIcon'),
-          tooltipClass: 'bg-light text-dark',
-          position: 'right'
-        },
-        {
-          element: document.querySelector('#verticalIconsKindsolidity'),
-          title: 'Solidity Compiler',
-          intro: 'Having selected a .sol file in the File Explorers (the icon above), compile it with the Solidity Compiler.',
-          tooltipClass: 'bg-light text-dark',
-          position: 'right'
-        },
-        {
-          title: 'Deploy your contract',
-          element: document.querySelector('#verticalIconsKindudapp'),
-          intro: 'Choose a chain, deploy a contract and play with your functions.',
           tooltipClass: 'bg-light text-dark',
           position: 'right'
         }

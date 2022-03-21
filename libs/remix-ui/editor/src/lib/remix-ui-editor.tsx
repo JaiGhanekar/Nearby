@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect, useReducer } from 'react' // eslint
 import { RemixUiEditorContextView, astNode } from '@remix-ui/editor-context-view'
 import Editor, { loader } from '@monaco-editor/react'
 import { reducerActions, reducerListener, initialState } from './actions/editor'
-import { language, conf } from './syntax'
-import { cairoLang, cairoConf } from './cairoSyntax'
+
 
 import './remix-ui-editor.css'
 
@@ -286,6 +285,8 @@ export const EditorUI = (props: EditorUIProps) => {
       monacoRef.current.editor.setModelLanguage(file.model, 'remix-solidity')
     } else if (file.language === 'cairo') {
       monacoRef.current.editor.setModelLanguage(file.model, 'remix-cairo')
+    } else if (file.language == 'typescript') {
+      debugger
     }
 
     setAnnotationsbyFile(props.currentFile)
@@ -374,15 +375,12 @@ export const EditorUI = (props: EditorUIProps) => {
 
   function handleEditorWillMount (monaco) {
     monacoRef.current = monaco
-    // Register a new language
-    monacoRef.current.languages.register({ id: 'remix-solidity' })
-    monacoRef.current.languages.register({ id: 'remix-cairo' })
-    // Register a tokens provider for the language
-    monacoRef.current.languages.setMonarchTokensProvider('remix-solidity', language)
-    monacoRef.current.languages.setLanguageConfiguration('remix-solidity', conf)
+    monacoRef.current.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: false,
+      noSyntaxValidation: true,
+      diagnosticCodesToIgnore: [2792, 2304]
+    })
 
-    monacoRef.current.languages.setMonarchTokensProvider('remix-cairo', cairoLang)
-    monacoRef.current.languages.setLanguageConfiguration('remix-cairo', cairoConf)
   }
 
   return (

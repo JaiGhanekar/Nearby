@@ -41,29 +41,73 @@ export function setGreeting(message: string): void {
 }
 `
 
+const counter = `
+import { storage, logging } from "near-sdk-as";
 
-const readme = `REMIX EXAMPLE PROJECT
+// --- contract code goes below
 
-Remix example project is present when Remix loads for the very first time or there are no files existing in the File Explorer.
-It contains 3 directories:
+export function incrementCounter(value: i32): void {
+  const newCounter = storage.getPrimitive<i32>("counter", 0) + value;
+  storage.set<i32>("counter", newCounter);
+  logging.log("Counter is now: " + newCounter.toString());
+}
 
-1. 'contracts': Holds three contracts with different complexity level, denoted with number prefix in file name.
-2. 'scripts': Holds two scripts to deploy a contract. It is explained below.
-3. 'tests': Contains one test file for 'Ballot' contract with unit tests in Solidity.
+export function decrementCounter(value: i32): void {
+  const newCounter = storage.getPrimitive<i32>("counter", 0) - value;
+  storage.set<i32>("counter", newCounter);
+  logging.log("Counter is now: " + newCounter.toString());
+}
+
+export function getCounter(): i32 {
+  return storage.getPrimitive<i32>("counter", 0);
+}
+
+export function resetCounter(): void {
+  storage.set<i32>("counter", 0);
+  logging.log("Counter is reset!");
+}
+`
+
+
+const readme = `NEARBY EXAMPLE PROJECT
+
+Nearby has the following example projects on the initial load inside the assembly directory:
+
+1. 'hello': A basic near contract https://docs.near.org/docs/develop/contracts/as/intro#contracts.
+2. 'greeting': A simple near contract example which interacts with the near blockchain storage to set and get a greeting.
+3. 'counter': A simple near contract to interact with a counter object.
+
 
 SCRIPTS
+ 'near.loadAccount(accountId)': 'Displays account data',
+ 'near.getAccountBalance(accountId)' : 'Get balance for account'
+ 'near.deploy(accountId, filePath)' : 'Build and deploy typescript file to the near blockchain using assembly script build',
+ 'near.signIn(accountId)': 'Sign in to the near wallet'
+ 'near.isSignedIn()': 'Determines if there is an active session'},
+ 'near.callContract(accountId, contractId, viewMethods, changeMethods, cb)' : 'Calls a smart contract that has been previously deployed to the near blockchain. See near-api-js call contract method.',
+ 'near.signOut()' : 'Terminates existing session',
+ 'near.help()': 'Show the available commands'
 
-The 'scripts' folder contains example async/await scripts for deploying the 'Storage' contract.
-For the deployment of any other contract, 'contractName' and 'constructorArgs' should be updated (along with other code if required).
-Scripts have full access to the web3.js and ethers.js libraries.
+EXAMPLES:
+Before interacting with any of the smart contracts we must sign in. This can be achieved by the 'near.signIn(accountId)' ex. accountname.testnet
+After signing in we can call the following command to build and deploy an example contract
+'near.deploy(accountId, filepath)' ex. near.deploy("accountname.testnet", "assembly/hello.ts")
+Once a contract is deployed to an account we can proceed to invoke the contract methods:
 
-To run a script, right click on file name in the file explorer and click 'Run'. Remember, Solidity file must already be compiled.
+Use near.callContract(accountId, contractId, viewMethods, changeMethods, cb) to invoke a contract on the near blockchain
 
-Output from script will appear in remix terminal.
+For example:
+near.callContract("example.testnet", "example.testnet", ["getGreeting"], ["setGreeting"], (contract) => contract.getGreeting({"accountId": "example.testnet"}))
+
+near.callContract("example.testnet", "example.testnet", ["getGreeting"], ["setGreeting"], (contract) => contract.setGreeting({"message": "Wow Nearby is so easy to use!!"}))
+
+
+Output from script will appear in the terminal.
 `
 
 export const examples = {
   helloWorld: {name: 'assembly/hello.ts', content: helloWorld},
   greeting: {name: 'assembly/greeting.ts', content: greeting},
+  counter: {name: 'assembly/counter.ts', content: counter},
   readme: { name: 'README.txt', content: readme }
 }

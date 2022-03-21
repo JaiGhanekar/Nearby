@@ -106,19 +106,9 @@ export const RemixUiHomeTab = (props: RemixUiHomeTabProps) => {
         setState(prevState => { return { ...prevState, showMediaPanel: 'none' } })
       }
     })
-    // to retrieve twitter feed
-    const scriptTwitter = document.createElement('script')
-    scriptTwitter.src = 'https://platform.twitter.com/widgets.js'
-    scriptTwitter.async = true
-    document.body.appendChild(scriptTwitter)
-    // to retrieve medium publications
-    const scriptMedium = document.createElement('script')
-    scriptMedium.src = 'https://www.twilik.com/assets/retainable/rss-embed/retainable-rss-embed.js'
-    scriptMedium.async = true
-    document.body.appendChild(scriptMedium)
+
     return () => {
-      document.body.removeChild(scriptTwitter)
-      document.body.removeChild(scriptMedium)
+
     }
   }, [])
 
@@ -316,28 +306,20 @@ export const RemixUiHomeTab = (props: RemixUiHomeTabProps) => {
                 <p className="mt-3 mb-0"><label>LOAD FROM:</label></p>
                 <div className="btn-group">
                   <button className="btn mr-1 btn-secondary" data-id="landingPageImportFromGistButton" onClick={() => importFromGist()}>Gist</button>
-                  <button className="btn mx-1 btn-secondary" data-id="landingPageImportFromGitHubButton" onClick={() => showFullMessage('Github', 'github URL', ['https://github.com/0xcert/ethereum-erc721/src/contracts/tokens/nf-token-metadata.sol', 'https://github.com/OpenZeppelin/openzeppelin-solidity/blob/67bca857eedf99bf44a4b6a0fc5b5ed553135316/contracts/access/Roles.sol'])}>GitHub</button>
+                  <button className="btn mx-1 btn-secondary" data-id="landingPageImportFromGitHubButton" onClick={() => showFullMessage('Github', 'github URL', ['https://github.com/near-examples/guest-book/blob/master/assembly/main.ts', 'https://github.com/near-examples/counter/blob/master/assembly/main.ts'])}>GitHub</button>
                   <button className="btn mx-1 btn-secondary" onClick={() => showFullMessage('Ipfs', 'ipfs URL', ['ipfs://<ipfs-hash>'])}>Ipfs</button>
-                  <button className="btn mx-1 btn-secondary" onClick={() => showFullMessage('Https', 'http/https raw content', ['https://raw.githubusercontent.com/OpenZeppelin/openzeppelin-contracts/master/contracts/token/ERC20/ERC20.sol'])}>https</button>
+                  <button className="btn mx-1 btn-secondary" onClick={() => showFullMessage('Https', 'http/https raw content', ['https://raw.githubusercontent.com/near-examples/counter/master/assembly/main.ts'])}>https</button>
                 </div>
               </div>
               <div className="ml-4 pl-4">
                 <h4>Resources</h4>
                 <p className="mb-1">
                   <i className="mr-2 fas fa-book"></i>
-                  <a className="remixui_home_text" target="__blank" href="https://remix-ide.readthedocs.io/en/latest/#">Documentation</a>
-                </p>
-                <p className="mb-1">
-                  <i className="mr-2 fab fa-gitter"></i>
-                  <a className="remixui_home_text" target="__blank" href="https://gitter.im/ethereum/remix">Gitter channel</a>
+                  <a className="remixui_home_text" target="__blank" href="https://docs.near.org/docs/develop/basics/getting-started">Documentation</a>
                 </p>
                 <p className="mb-1">
                   <img id='remixHhomeWebsite' className="mr-2 remixui_home_image" src={ plugin.profile.icon } style={ { filter: state.themeQuality.filter } } alt=''></img>
-                  <a className="remixui_home_text" target="__blank" href="https://remix-project.org">Featuring website</a>
-                </p>
-                <p className="mb-1">
-                  <i className="mr-2 fab fa-ethereum remixui_home_image"></i>
-                  <label className="remixui_home_text" onClick={() => switchToPreviousVersion()}>Old experience</label>
+                  <a className="remixui_home_text" target="__blank" href="https://awesomenear.com">Featuring website</a>
                 </p>
               </div>
             </div>
@@ -345,28 +327,6 @@ export const RemixUiHomeTab = (props: RemixUiHomeTabProps) => {
         </div>
         <div className="d-flex flex-column remixui_home_rightPanel">
           <div className="d-flex pr-3 py-2 align-self-end" id="remixIDEMediaPanelsTitle">
-            <button
-              className="btn-info p-2 m-1 border rounded-circle remixui_home_mediaBadge fab fa-twitter"
-              id="remixIDEHomeTwitterbtn"
-              title="Twitter"
-              onClick={(e) => {
-                setState(prevState => {
-                  return { ...prevState, showMediaPanel: state.showMediaPanel === 'twitter' ? 'none' : 'twitter' }
-                })
-                _paq.push(['trackEvent', 'pluginManager', 'media', 'twitter'])
-              }}
-            ></button>
-            <button
-              className="btn-danger p-2 m-1 border rounded-circle remixui_home_mediaBadge fab fa-medium"
-              id="remixIDEHomeMediumbtn"
-              title="Medium blogs"
-              onClick={(e) => {
-                setState(prevState => {
-                  return { ...prevState, showMediaPanel: state.showMediaPanel === 'medium' ? 'none' : 'medium' }
-                })
-                _paq.push(['trackEvent', 'pluginManager', 'media', 'medium'])
-              }}
-            ></button>
           </div>
           <div
             className="mr-3 d-flex bg-light remixui_home_panels"
