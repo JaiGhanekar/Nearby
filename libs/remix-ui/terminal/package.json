@@ -1,4 +1,10 @@
 {
   "name": "remix-ui-terminal",
-  "version": "0.0.1"
+  "scripts": {
+    "test": "./../../../node_modules/.bin/ts-node --require tsconfig-paths/register ./../../../node_modules/.bin/jest ./tests/"
+  },
+  "version": "0.0.1",
+  "devDependencies": {
+    "@types/jest": "^27.4.1"
+  }
 }

@@ -53,7 +53,7 @@ export async function deployCodeCommand(accountId: string, file: string, fileMan
   }
 }
 
-export async function loadAccountCommand(accountId: string, cb: (error: any, output?: any)  => void) {
+export async function loadAccountCommand(accountId: string, cb: (error: any, output?: any) => void) {
   try {
     const account = await loadAccount(accountId)
     cb(null, account)
@@ -129,8 +129,6 @@ async function callContract(accountId: string, contractId: string, viewMethods: 
     const result = await cb(contract)
     return result
 }
-
-
 
 async function isSignedIn(pendingPrefix = 'near-api-js:keystore:pending_key'): Promise<boolean> {
   const near = await connection(NetworkId[NETWORK_ID])
