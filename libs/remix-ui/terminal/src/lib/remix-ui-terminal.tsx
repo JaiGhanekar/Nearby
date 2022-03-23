@@ -19,8 +19,8 @@ import RenderKnownTransactions from './components/RenderKnownTransactions' // es
 import parse from 'html-react-parser'
 import { EMPTY_BLOCK, KNOWN_TRANSACTION, RemixUiTerminalProps, UNKNOWN_TRANSACTION } from './types/terminalTypes'
 import { wrapScript } from './utils/wrapScript'
-import * as nearAPI from 'near-api-js'
-import { WalletConnection } from 'near-api-js'
+import {deployCodeCommand, loadAccountCommand, getAccountBalanceCommand, signInCommand, isSignedInCommand, signOutCommand, callContractCommand,
+helpCommand} from '../lib/context/context'
 /* eslint-disable-next-line */
 export interface ClipboardEvent<T = Element> extends SyntheticEvent<T, any> {
   clipboardData: DataTransfer;
@@ -77,13 +77,7 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
   // terminal dragable
   const panelRef = useRef(null)
   const terminalMenu = useRef(null)
-  const COMPILE_ENDPOINT = 'http://localhost:3000/deploy'
-  const WALLET_PREFIX = 'wallet'
-  const HASH_URL_DELIM = '/#'
-  const QUERY_PARAM_DELIM = '?'
-  const EMPTY_STR = ''
-  const SIGN_IN_REQUIRED_ERROR = 'Error this command requires sign in, continue by running near.signIn(accountId)'
-  const KEY_DOES_NOT_EXIST_ERROR = 'Error authentication key required please run near.signIn(accountId)'
+
 
   const scrollToBottom = () => {
     messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
@@ -172,127 +166,43 @@ export const RemixUiTerminal = (props: RemixUiTerminalProps) => {
     if (cb) cb()
   }
 
-  async function deployCode(accountId: string, file: string, key: string): Promise<any> {
-    const content = await _deps.fileManager.readFile(file)
-    const headers = {'Content-Type': 'text/plain', 'accountid': accountId, key: key}
-    const result = await axios.post(COMPILE_ENDPOINT, content, { headers })
-    //TODO: Handle bad code input
-    return result
-  }
 
-  async function isSignedIn(pendingPrefix = 'near-api-js:keystore:pending_key'): Promise<boolean> {
-    const near = await connection()
-    const wallet = new WalletConnection(near, WALLET_PREFIX)
-    //TODO: FIXME this is a hack for sign in to query the url
-    if (Object.keys(localStorage).filter((key) => key.indexOf(pendingPrefix) >= 0).length > 0) {
-      const convertedUrl = window.location.href.replace(HASH_URL_DELIM, QUERY_PARAM_DELIM)
-      window.history.pushState(EMPTY_STR, EMPTY_STR, convertedUrl)
-      await wallet._completeSignInWithAccessKey()
-    }
-    return wallet.isSignedIn()
-  }
-
-
-  async function connection(): Promise<nearAPI.Near> {
-    const { keyStores, connect } = nearAPI
-    const keyStore = new keyStores.BrowserLocalStorageKeyStore();
-    const config = {
-      networkId: "testnet",
-      keyStore,
-      nodeUrl: "https://rpc.testnet.near.org",
-      walletUrl: "https://wallet.testnet.near.org",
-      helperUrl: "https://helper.testnet.near.org",
-      explorerUrl: "https://explorer.testnet.near.org",
-      headers: {}
-    }
-
-    return connect(config)
-  }
-
-  async function loadAccount(accountName: string) : Promise<any> {
-    const near = await connection()
-    return await near.account(accountName)
-  }
 
   const _shell = async (script, scopedCommands, done) => { // default shell
-    if (script.indexOf('remix:') === 0) {
-      return done(null, 'This type of command has been deprecated and is not functionning anymore. Please run remix.help() to list available commands.')
-    }
     try {
       if (script.trim().startsWith('git')) {
         // await this.call('git', 'execute', script) code might be used in the future
       } else {
-        const near_context = {
+
+        const nearContext = {
             near: {
               loadAccount: async (accountId: string) => {
-                const account = await loadAccount(accountId)
-                console.log(account)
-                return done(null, account)
+                await loadAccountCommand(accountId, done)
               },
               getAccountBalance: async (accountId: string) => {
-                const account = await loadAccount(accountId)
-                const balance = await account.getAccountBalance()
-                return done(null, balance)
+                await getAccountBalanceCommand(accountId, done)
               },
               deploy: async (accountId: string, filePath: string) => {
-                try {
-                  if (await isSignedIn()) {
-                    const key = localStorage.getItem(`near-api-js:keystore:${accountId}:testnet`)
-                    if (key) {
-                      try {
-                        const res = await deployCode(accountId, filePath, key)
-                        done(null, res)
-                      } catch (error) {
-                        done(error.response.data.message)
-                      }
-                    } else {
-                      done(KEY_DOES_NOT_EXIST_ERROR)
-                    }
-                  } else {
-                      done(SIGN_IN_REQUIRED_ERROR)
-                  }
-
-                } catch (error) {
-                  done(error.messages)
-                }
+                await deployCodeCommand(accountId, filePath, _deps.fileManager, done)
               },
               signIn: async (contractId: string) => {
-                const near = await connection()
-                var wallet = new WalletConnection(near, WALLET_PREFIX)
-                await wallet.requestSignIn({ contractId: contractId })
-                done()
+                await signInCommand(contractId, done)
               },
               isSignedIn: async () => {
-                done(null, await isSignedIn() ? "true" : "false")
+                await isSignedInCommand(done)
               },
               signOut: async () => {
-                const near = await connection()
-                var wallet = new WalletConnection(near, WALLET_PREFIX)
-                wallet.signOut()
+                await signOutCommand(done)
               },
               help: async () => {
-                const commands = `The following commands can be used: loadAccount, getAccountBalance, deploy, signIn, isSignedIn, signOut. Ex: near.deploy("example.testnet","assembly/hello.ts")`
-                done(null, commands)
+                helpCommand(done)
               },
               callContract: async (accountId: string, contractId: string, viewMethods: Array<string>, changeMethods: Array<string>, cb: any) => {
-                try {
-                  const account = await loadAccount(accountId)
-                  const contract = new nearAPI.Contract(
-                    account,
-                    contractId,
-                    {
-                      viewMethods: viewMethods,
-                      changeMethods: changeMethods,
-                    })
-                    const result = await cb(contract)
-                    done(null, result)
-                  } catch (error) {
-                    done(JSON.stringify(error.message))
-                  }
+                await callContractCommand(accountId, contractId, viewMethods, changeMethods, cb, done)
               }
             }
           }
-          const cmds = vm.createContext(near_context)
+          const cmds = vm.createContext(nearContext)
           const result = vm.runInContext(script, cmds) // eslint-disable-line
           console.log({ result })
           return done(null, result)
