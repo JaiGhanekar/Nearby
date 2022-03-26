@@ -49,7 +49,7 @@ export async function deployCodeCommand(accountId: string, file: string, fileMan
         cb(SIGN_IN_REQUIRED_ERROR)
     }
   } catch (error) {
-    cb(error.messages)
+    cb(error)
   }
 }
 
@@ -102,7 +102,6 @@ async function signIn(contractId: string) {
   var wallet = new WalletConnection(near, WALLET_PREFIX)
   await wallet.requestSignIn({ contractId: contractId })
 }
-
 
 async function signOut() {
   const near = await connection(NetworkId[NETWORK_ID])

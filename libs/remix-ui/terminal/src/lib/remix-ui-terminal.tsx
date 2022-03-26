@@ -7,7 +7,7 @@ import {allCommands, allPrograms} from './commands' // eslint-disable-line
 import TerminalWelcomeMessage from './terminalWelcome' // eslint-disable-line
 import { Toaster } from '@remix-ui/toaster' // eslint-disable-line
 import { ModalDialog } from '@remix-ui/modal-dialog' // eslint-disable-line
-import axios from 'axios'
+
 
 import './remix-ui-terminal.css'
 import vm from 'vm'
