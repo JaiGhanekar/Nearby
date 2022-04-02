@@ -1,7 +1,8 @@
 import * as nearAPI from 'near-api-js'
 const { WalletConnection } = nearAPI
 import axios from 'axios'
-const { NETWORK_ID, COMPILE_ENDPOINT } = process.env
+import 'dotenv/config'
+const { NX_NETWORK_ID, NX_COMPILE_ENDPOINT } = process.env
 const WALLET_PREFIX = 'wallet'
 const HASH_URL_DELIM = '/#'
 const QUERY_PARAM_DELIM = '?'
@@ -32,7 +33,7 @@ async function connection(networkId: NetworkId = NetworkId.Test): Promise<nearAP
 export async function deployCodeCommand(accountId: string, file: string, fileManager: any, cb: (error: any, output?: any)  => void) {
   try {
     if (await isSignedIn()) {
-      const networkId =  NETWORK_ID != undefined ? NETWORK_ID : NetworkId.Test
+      const networkId =  NX_NETWORK_ID != undefined ? NX_NETWORK_ID : NetworkId.Test
       const key = localStorage.getItem(`near-api-js:keystore:${accountId}:${networkId}`)
       if (key) {
         try {
@@ -97,13 +98,13 @@ export function helpCommand(cb: (error?: any, output?: any) => void) {
 }
 
 async function signIn(contractId: string) {
-  const near = await connection(NetworkId[NETWORK_ID])
+  const near = await connection(NetworkId[NX_NETWORK_ID])
   var wallet = new WalletConnection(near, WALLET_PREFIX)
   await wallet.requestSignIn({ contractId: contractId })
 }
 
 async function signOut() {
-  const near = await connection(NetworkId[NETWORK_ID])
+  const near = await connection(NetworkId[NX_NETWORK_ID])
   var wallet = new WalletConnection(near, WALLET_PREFIX)
   wallet.signOut()
 }
@@ -111,7 +112,7 @@ async function signOut() {
 async function deployCode(accountId: string, file: string, key: string, fileManager: any): Promise<any> {
   const content = await fileManager.readFile(file)
   const headers = {'Content-Type': 'text/plain', 'accountid': accountId, key: key}
-  const result = await axios.post(COMPILE_ENDPOINT, content, { headers })
+  const result = await axios.post(NX_COMPILE_ENDPOINT, content, { headers })
   return result
 }
 
@@ -129,7 +130,7 @@ async function callContract(accountId: string, contractId: string, viewMethods: 
 }
 
 async function isSignedIn(pendingPrefix = 'near-api-js:keystore:pending_key'): Promise<boolean> {
-  const near = await connection(NetworkId[NETWORK_ID])
+  const near = await connection(NetworkId[NX_NETWORK_ID])
   const wallet = new WalletConnection(near, WALLET_PREFIX)
   //TODO: FIXME this is a hack for sign in to query the url
   if (Object.keys(localStorage).filter((key) => key.indexOf(pendingPrefix) >= 0).length > 0) {
@@ -141,6 +142,6 @@ async function isSignedIn(pendingPrefix = 'near-api-js:keystore:pending_key'): P
 }
 
 async function loadAccount(accountName: string): Promise<any> {
-  const near = await connection(NetworkId[NETWORK_ID])
+  const near = await connection(NetworkId[NX_NETWORK_ID])
   return await near.account(accountName)
 }
