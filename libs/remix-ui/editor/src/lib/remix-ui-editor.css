@@ -1,7 +1,7 @@
 .hover-row {
     white-space: pre;
     margin-left : 10px;
-    background : var(--light);    
+    background : var(--light);
     font-weight : bold;
     font-family : monospace;
     padding : 10px;
@@ -13,6 +13,9 @@
 .monaco-hover .markdown-hover > .hover-contents:not(.code-hover-contents) {
     max-width: none !important;
     word-wrap: break-word;
+}
+div.overflowingContentWidgets {
+ display:none;
 }
 
 .contextview {
