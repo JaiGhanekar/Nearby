@@ -98,13 +98,14 @@ export function helpCommand(cb: (error?: any, output?: any) => void) {
 }
 
 async function signIn(contractId: string) {
-  const near = await connection(NetworkId[NX_NETWORK_ID])
+  debugger
+  const near = await connection(NX_NETWORK_ID as NetworkId)
   var wallet = new WalletConnection(near, WALLET_PREFIX)
   await wallet.requestSignIn({ contractId: contractId })
 }
 
 async function signOut() {
-  const near = await connection(NetworkId[NX_NETWORK_ID])
+  const near = await connection(NX_NETWORK_ID as NetworkId)
   var wallet = new WalletConnection(near, WALLET_PREFIX)
   wallet.signOut()
 }
@@ -130,7 +131,7 @@ async function callContract(accountId: string, contractId: string, viewMethods: 
 }
 
 async function isSignedIn(pendingPrefix = 'near-api-js:keystore:pending_key'): Promise<boolean> {
-  const near = await connection(NetworkId[NX_NETWORK_ID])
+  const near = await connection(NX_NETWORK_ID as NetworkId)
   const wallet = new WalletConnection(near, WALLET_PREFIX)
   //TODO: FIXME this is a hack for sign in to query the url
   if (Object.keys(localStorage).filter((key) => key.indexOf(pendingPrefix) >= 0).length > 0) {
@@ -142,6 +143,6 @@ async function isSignedIn(pendingPrefix = 'near-api-js:keystore:pending_key'): P
 }
 
 async function loadAccount(accountName: string): Promise<any> {
-  const near = await connection(NetworkId[NX_NETWORK_ID])
+  const near = await connection(NX_NETWORK_ID as NetworkId)
   return await near.account(accountName)
 }
