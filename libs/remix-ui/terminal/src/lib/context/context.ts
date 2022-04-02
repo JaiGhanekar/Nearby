@@ -1,8 +1,7 @@
 import * as nearAPI from 'near-api-js'
 const { WalletConnection } = nearAPI
 import axios from 'axios'
-const { NETWORK_ID } = process.env
-const COMPILE_ENDPOINT = 'https://near-compiler-service-testnet.onrender.com/deploy'
+const { NETWORK_ID, COMPILE_ENDPOINT } = process.env
 const WALLET_PREFIX = 'wallet'
 const HASH_URL_DELIM = '/#'
 const QUERY_PARAM_DELIM = '?'
