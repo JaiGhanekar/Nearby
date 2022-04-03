@@ -1,32 +1,53 @@
-[![CircleCI](https://circleci.com/gh/ethereum/remix-project.svg?style=svg)](https://circleci.com/gh/ethereum/remix-project)
-[![Documentation Status](https://readthedocs.org/projects/docs/badge/?version=latest)](https://remix-ide.readthedocs.io/en/latest/index.html)
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/ethereum/remix-project/blob/master/CONTRIBUTING.md)
-![GitHub contributors](https://img.shields.io/github/contributors/ethereum/remix-project)
-[![Awesome Remix](https://img.shields.io/badge/Awesome--Remix-resources-green)](https://github.com/ethereum/awesome-remix)
-![GitHub](https://img.shields.io/github/license/ethereum/remix-project)
-[![Join the chat at https://gitter.im/ethereum/remix](https://badges.gitter.im/ethereum/remix.svg)](https://gitter.im/ethereum/remix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Twitter Follow](https://img.shields.io/twitter/follow/ethereumremix?style=social)](https://twitter.com/ethereumremix)
+# Nearby Project
 
-# Remix Project
+**Nearby** is a setup wizard for near contracts. Users will be able to access a user interface that will dynamically provide them with a starter template code for different types of Near contract definitions.
 
-**Remix Project** is a platform for development tools that use a plugin architecture. It encompasses sub-projects including Remix Plugin Engine, Remix Libraries, and of course Remix IDE.
+# Demo
 
-**Remix IDE** is an open source web and desktop application. It fosters a fast development cycle and has a rich set of plugins with intuitive GUIs. Remix is used for the **entire journey of contract development with [Solidity language](https://soliditylang.org/)** as well as a playground for learning and teaching [Ethereum](https://ethereum.org/).
+[![Nearby in action](https://img.youtube.com/vi/nge-spbixWg/hqdefault.jpg
+)](https://youtu.be/nge-spbixWg)
 
-Start developing using Remix on browser, visit: [https://remix.ethereum.org](https://remix.ethereum.org)
+# Deployments
+Start developing using Nearby on browser, visit: [https://nearby.onrender.com](https://nearby.onrender.com)
 
-For desktop version, see releases: [https://github.com/ethereum/remix-desktop/releases](https://github.com/ethereum/remix-desktop/releases)
+Start developing using Nearby on browser for testnet, visit: [https://nearby-testnet.onrender.com](https://nearby-testnet.onrender.com)
 
-![Remix screenshot](https://github.com/ethereum/remix-project/raw/master/apps/remix-ide/remix_screenshot.png)
 
-:point_right: **Remix libraries** work as a core of native plugins of Remix IDE. Read more about libraries [here](libs/README.md)
+# How to use
+NEARBY EXAMPLE PROJECT
 
-## Offline Usage
+Nearby has the following example projects on the initial load inside the assembly directory:
 
-The `gh-pages` branch of [remix-live](https://github.com/ethereum/remix-live) always has the latest stable build of Remix. It contains a ZIP file with the entire build. Download it to use offline.
+1. 'hello': A basic near contract https://docs.near.org/docs/develop/contracts/as/intro#contracts.
+2. 'greeting': A simple near contract example which interacts with the near blockchain storage to set and get a greeting.
+3. 'counter': A simple near contract to interact with a counter object.
 
-Note: It contains the latest supported version of Solidity available at the time of the packaging. Other compiler versions can be used online only.
+SCRIPTS
+```
+ 'near.loadAccount(accountId)': 'Displays account data',
+ 'near.getAccountBalance(accountId)' : 'Get balance for account'
+ 'near.deploy(accountId, filePath)' : 'Build and deploy typescript file to the near blockchain using assembly script build',
+ 'near.signIn(accountId)': 'Sign in to the near wallet'
+ 'near.isSignedIn()': 'Determines if there is an active session'},
+ 'near.callContract(accountId, contractId, viewMethods, changeMethods, cb)' : 'Calls a smart contract that has been previously deployed to the near blockchain. See near-api-js call contract method.',
+ 'near.signOut()' : 'Terminates existing session',
+ 'near.help()': 'Show the available commands'
+```
+EXAMPLES:
+Before interacting with any of the smart contracts we must sign in. This can be achieved by the 'near.signIn(accountId)' ex. accountname.testnet
+After signing in we can call the following command to build and deploy an example contract
+'near.deploy(accountId, filepath)' ex. near.deploy("accountname.testnet", "assembly/hello.ts")
+Once a contract is deployed to an account we can proceed to invoke the contract methods:
 
+Use near.callContract(accountId, contractId, viewMethods, changeMethods, cb) to invoke a contract on the near blockchain
+
+For example:
+```near.callContract("example.testnet", "example.testnet", ["getGreeting"], ["setGreeting"], (contract) => contract.getGreeting({"accountId": "example.testnet"}))```
+
+```near.callContract("example.testnet", "example.testnet", ["getGreeting"], ["setGreeting"], (contract) => contract.setGreeting({"message": "Wow Nearby is so easy to use!!"}))```
+
+
+Output from script will appear in the terminal.
 
 ## Setup
 
@@ -74,7 +95,7 @@ Production build will be served by default to `http://localhost:8080/` or `http:
 
 ## Docker:
 
-Prerequisites: 
+Prerequisites:
 * Docker (https://docs.docker.com/desktop/)
 * Docker Compose (https://docs.docker.com/compose/install/)
 
@@ -138,25 +159,25 @@ To run the Selenium tests via Nightwatch:
  - Build & Serve Remix: `nx serve`
  - Run all the end-to-end tests:
 
-    for Firefox: `npm run nightwatch_local_firefox`, or 
+    for Firefox: `npm run nightwatch_local_firefox`, or
 
     for Google Chrome: `npm run nightwatch_local_chrome`
- - Run a specific test case instead, use one of following commands: 
- 
+ - Run a specific test case instead, use one of following commands:
+
 		- npm run nightwatch_local_ballot
 
         - npm run nightwatch_local_usingWorker
-		
+
 		- npm run nightwatch_local_libraryDeployment
-		
+
 		- npm run nightwatch_local_solidityImport
-		
+
 		- npm run nightwatch_local_recorder
-		
+
 		- npm run nightwatch_local_transactionExecution
-		
+
 		- npm run nightwatch_local_staticAnalysis
-		
+
 		- npm run nightwatch_local_signingMessage
 
         - npm run nightwatch_local_specialFunctions
@@ -192,22 +213,15 @@ To run the Selenium tests via Nightwatch:
         - npm run nightwatch_local_fileManager
 
         - npm run nightwatch_local_runAndDeploy
-		
-        
+
+
 **NOTE:**
 
 - **The `ballot` tests suite** requires to run `ganache-cli` locally.
 
 - **The `remixd` tests suite** requires to run `remixd` locally.
 
-- **The `gist` tests suite** requires specifying a github access token in **.env file**. 
+- **The `gist` tests suite** requires specifying a github access token in **.env file**.
 ```
     gist_token = <token> // token should have permission to create a gist
 ```
-
-## Important Links
-
-- Official documentation: https://remix-ide.readthedocs.io/en/latest/
-- Curated list of Remix resources, tutorials etc.: https://github.com/ethereum/awesome-remix
-- Medium: https://medium.com/remix-ide
-- Twitter: https://twitter.com/ethereumremix
